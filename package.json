@@ -1,0 +1,35 @@
+{
+  "name": "@latticeag/sunlight",
+  "version": "1.0.0",
+  "description": "Sunlight v1 — sign-at-creation provenance: artifact hashing, Ed25519 attestations, per-transform lineage, hash-chained audit ledger, and portable offline verification.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "bin": {
+    "sunlight": "dist/src/main.js"
+  },
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/src/index.js"
+    }
+  },
+  "files": [
+    "dist/src",
+    "worker/dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json && node -e \"require('node:fs').copyFileSync('tests/fixtures.json','dist/tests/fixtures.json')\"",
+    "test": "npm run build && node --test \"dist/tests/*.test.js\"",
+    "test:python": "python3 -m pytest python/tests -q",
+    "check": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.2",
+    "typescript": "^5.9.3"
+  }
+}

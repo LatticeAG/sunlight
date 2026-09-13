@@ -1,0 +1,21 @@
+# Sunlight self-hosted registry — Cloudflare Worker + SQLite Durable Object.
+# Deploy with a pinned Wrangler version and the tested compatibility date;
+# secrets are provisioned separately from source control (spec §8).
+
+name = "sunlight-registry"
+main = "../dist/worker/index.js"
+compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[[durable_objects.bindings]]
+name = "SUNLIGHT_LEDGERS"
+class_name = "LedgerDO"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["LedgerDO"]
+
+# Secrets (wrangler secret put / dashboard — never commit):
+#   SUNLIGHT_DEPLOYMENT      strict-JSON DeploymentConfig (sunlight.deployment/1)
+#   REGISTRY_TOKENS          strict-JSON TokenBinding array (auth_secret_binding)
+#   <audit_secret_binding>   64-hex audit Ed25519 seed per ledger

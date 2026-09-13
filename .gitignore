@@ -1,0 +1,29 @@
+# Spec / build-process artifacts — never tracked in the product repo
+SPEC*.md
+*EXTREME*.md
+PROMPT*.md
+REVIEW*.md
+FIX_PROMPT*
+SELFREVIEW*
+DRAFT*
+REPORT.md
+INTERFACES.md
+STATUS*
+BUILD_PROMPT.md
+
+# Build outputs and environments
+node_modules/
+dist/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.tsbuildinfo
+
+# Local Sunlight state
+.sunlight-cache/
+sunlight.json
+*.key.json
+*.slb.json
+stage/
+release/

@@ -36,6 +36,7 @@ import {
   nowMs, freshNonceHex, fixedRequestId, keyEntropyHex, conformanceEnabled,
 } from "./conformance-env.js";
 import { runConformance } from "./conformance.js";
+import { emitGenesis } from "./genesis.js";
 
 const ENV_NAME_RE = /^[A-Z][A-Z0-9_]{0,63}$/;
 const FOREIGN_FORMATS = new Set([
@@ -559,6 +560,21 @@ export async function runCli(argv: string[]): Promise<{ code: number; result?: u
       // Revoked/denied authority and incomplete lineage are reportable but the
       // audit verdict itself is integrity+pin only.
       return { code: 0, result: { integrity: "VALID", head: v.head } };
+    }
+
+    case "genesis": {
+      // Mint a development deployment fixture stamped at the real clock (or
+      // a caller-pinned --created-at-ms) — never the golden conformance T.
+      const out = needOpt(flags, "out");
+      let createdAt = nowMs();
+      const pinned = optStr(flags, "created-at-ms");
+      if (pinned !== null) {
+        const n = Number(pinned);
+        if (!Number.isSafeInteger(n) || n < 0) throw new SunlightError("USAGE");
+        createdAt = n;
+      }
+      const result = emitGenesis(out, passphraseForKey(flags), createdAt);
+      return { code: 0, result };
     }
 
     case "conformance": {

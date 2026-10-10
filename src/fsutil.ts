@@ -26,15 +26,22 @@ export function readFileBytesSync(path: string, max = 32 * 1024 * 1024): Buffer 
 /** Exclusive-create write (no overwrite flag in v1) with fsync. */
 export function writeFileExclusive(path: string, data: Buffer | string, mode = 0o600): void {
   mkdirSync(dirname(path), { recursive: true });
-  const fd = openSync(path, "wx", mode);
+  let fd: number;
+  try {
+    fd = openSync(path, "wx", mode);
+  } catch (e) {
+    // EEXIST must surface as OUTPUT_EXISTS; a raw errno escape reads as
+    // IO_ERROR to the caller and hides that the file already exists.
+    if ((e as NodeJS.ErrnoException).code === "EEXIST") {
+      throw new SunlightError("OUTPUT_EXISTS");
+    }
+    throw new SunlightError("IO_ERROR", null, e);
+  }
   try {
     const buf = typeof data === "string" ? Buffer.from(data, "utf8") : data;
     let off = 0;
     while (off < buf.length) off += writeSync(fd, buf, off, buf.length - off);
     fsyncSync(fd);
-  } catch (e) {
-    if ((e as NodeJS.ErrnoException).code === "EEXIST") throw new SunlightError("OUTPUT_EXISTS");
-    throw e;
   } finally {
     closeSync(fd);
   }

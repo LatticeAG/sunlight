@@ -52,7 +52,7 @@ submits, and verifies against the same canonical encodings and fixtures.
 
 ```sh
 npm install -g @latticeag/sunlight      # or: npm ci && npm run build
-sunlight registry serve --data ./registry.db --listen 127.0.0.1:8787 &
+sunlight registry serve --deployment ./deployment.json --listen 127.0.0.1:8787 &
 sunlight init --registry http://127.0.0.1:8787 --ledger sll_...
 sunlight key generate --role producer --out producer.key.json --public-out producer.pub.json
 sunlight hash --artifact dataset.bin --profile bytes/1 --json
@@ -66,6 +66,16 @@ sunlight verify --bundle bundle.json --trust trust.json \
   --artifact dataset.bin --profile bytes/1 --json
 sunlight audit verify --bundle bundle.json
 ```
+
+Before starting the registry, prepare a `sunlight.deployment/1` JSON file
+with ledger genesis records and environment variable names for the secret
+bindings (see `DEPLOY_CONFIG` in `src/fixtures.ts` for the shape). Set the
+variable named by `auth_secret_binding` to a JSON array of token bindings,
+each containing `token_sha256`, `ledger`, and `role` (`read` or `write`).
+Set each ledger's `audit_secret_binding` variable to its audit Ed25519 seed
+as 64 lowercase hex characters; a missing or invalid seed makes that ledger
+read-only. SQLite files are stored in `.sunlight-registry` alongside the
+deployment file.
 
 Exit codes: `0` verified/ok, `3` invalid verification, `5` transport,
 `7` command rejection (`IDEMPOTENCY_CONFLICT`, `STALE_HEAD`, ...).

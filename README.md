@@ -54,7 +54,7 @@ submits, and verifies against the same canonical encodings and fixtures.
 npm install -g @latticeag/sunlight      # or: npm ci && npm run build
 sunlight registry serve --data ./registry.db --listen 127.0.0.1:8787 &
 sunlight init --registry http://127.0.0.1:8787 --ledger sll_...
-sunlight key generate --role producer --out producer.key.json
+sunlight key generate --role producer --out producer.key.json --public-out producer.pub.json
 sunlight hash --artifact dataset.bin --profile bytes/1 --json
 sunlight sign --body statement-body.json --artifact dataset.bin \
   --key producer.key.json --out statement.json

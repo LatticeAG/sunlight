@@ -72,6 +72,10 @@ Exit codes: `0` verified/ok, `3` invalid verification, `5` transport,
 
 Python client:
 
+Install from the repository root with `python3 -m pip install -e .` (in a
+virtual environment if appropriate). The package metadata is at the root,
+not in `python/`.
+
 ```python
 from sunlight import sign_statement, verify_bundle
 

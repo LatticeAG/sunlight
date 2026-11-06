@@ -77,6 +77,18 @@ as 64 lowercase hex characters; a missing or invalid seed makes that ledger
 read-only. SQLite files are stored in `.sunlight-registry` alongside the
 deployment file.
 
+For non-interactive key generation, provide the passphrase on a file
+descriptor using `SUNLIGHT_KEY_PASSPHRASE_FD`. For example, with a protected
+file containing the passphrase on its first line:
+
+```sh
+SUNLIGHT_KEY_PASSPHRASE_FD=3 sunlight key generate --role producer \
+  --out producer.key.json --public-out producer.pub.json 3< ./passphrase.txt
+```
+
+Keep the passphrase file private. Key-loading commands also accept this
+descriptor; reopen it for each command so it can read the passphrase again.
+
 Exit codes: `0` verified/ok, `3` invalid verification, `5` transport,
 `7` command rejection (`IDEMPOTENCY_CONFLICT`, `STALE_HEAD`, ...).
 

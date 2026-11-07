@@ -1,6 +1,8 @@
 /** CLI-level checks: hash output, strict exits, and the conformance command. */
 
 import test from "node:test";
+import { spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 import assert from "node:assert/strict";
 import { mkdtempSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -71,4 +73,15 @@ test("offline verify of F4 returns V4", async () => {
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
+});
+
+test("key generate --help prints usage without generating a key", () => {
+  const mainPath = fileURLToPath(new URL("../src/main.js", import.meta.url));
+  const r = spawnSync(process.execPath, [mainPath, "key", "generate", "--help"], { encoding: "utf8" });
+  assert.equal(r.status, 0);
+  assert.equal(r.stderr, "");
+  assert.match(r.stdout, /Usage: sunlight key generate/);
+  assert.match(r.stdout, /--out <path>/);
+  assert.match(r.stdout, /--public-out <path>/);
+  assert.match(r.stdout, /SUNLIGHT_KEY_PASSPHRASE_FD/);
 });

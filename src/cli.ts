@@ -247,6 +247,20 @@ export async function runCli(argv: string[]): Promise<{ code: number; result?: u
     case "key": {
       const sub = pos[1];
       if (sub === "generate") {
+        if (flags.opts.help === true) {
+          return { code: 0, human: [
+            "Usage: sunlight key generate --out <path> --public-out <path> [--role <role>] [--json]",
+            "",
+            "Generate an encrypted private key and its public key.",
+            "  --out <path>         Write the encrypted private key to this path (required)",
+            "  --public-out <path>  Write the public key to this path (required)",
+            "  --role <role>        Accepted for compatibility; does not affect the key",
+            "  --json               Output the result as JSON",
+            "  --help               Show this help",
+            "",
+            "Set SUNLIGHT_KEY_PASSPHRASE_FD to a file descriptor containing the passphrase.",
+          ].join("\n") };
+        }
         const out = needOpt(flags, "out");
         const publicOut = needOpt(flags, "public-out");
         const entropyHex = keyEntropyHex();
@@ -651,7 +665,9 @@ export async function main(argv: string[]): Promise<number> {
       // `registry serve` already emitted its listening report.
       return r.code;
     }
-    if (json) {
+    if (r.human !== undefined && r.result === undefined) {
+      process.stdout.write(r.human + "\n");
+    } else if (json) {
       process.stdout.write(JSON.stringify(r.result) + "\n");
     } else if (r.human !== undefined) {
       process.stdout.write(r.human + "\n");

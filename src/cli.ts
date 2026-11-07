@@ -247,7 +247,7 @@ export async function runCli(argv: string[]): Promise<{ code: number; result?: u
     case "key": {
       const sub = pos[1];
       if (sub === "generate") {
-        if (flags.opts.help === true) {
+        if (flags.opts.help === true || pos.includes("-h")) {
           return { code: 0, human: [
             "Usage: sunlight key generate --out <path> --public-out <path> [--role <role>] [--json]",
             "",
@@ -256,7 +256,7 @@ export async function runCli(argv: string[]): Promise<{ code: number; result?: u
             "  --public-out <path>  Write the public key to this path (required)",
             "  --role <role>        Accepted for compatibility; does not affect the key",
             "  --json               Output the result as JSON",
-            "  --help               Show this help",
+            "  -h, --help           Show this help",
             "",
             "Set SUNLIGHT_KEY_PASSPHRASE_FD to a file descriptor containing the passphrase.",
           ].join("\n") };

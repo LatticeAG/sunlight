@@ -4,7 +4,7 @@ import test from "node:test";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import assert from "node:assert/strict";
-import { mkdtempSync, writeFileSync, rmSync } from "node:fs";
+import { mkdtempSync, writeFileSync, rmSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { runCli } from "../src/cli.js";
@@ -84,4 +84,20 @@ test("key generate --help prints usage without generating a key", () => {
   assert.match(r.stdout, /--out <path>/);
   assert.match(r.stdout, /--public-out <path>/);
   assert.match(r.stdout, /SUNLIGHT_KEY_PASSPHRASE_FD/);
+});
+
+test("key generate -h shows help without reading a passphrase or writing keys", () => {
+  const dir = tmp();
+  try {
+    const mainPath = fileURLToPath(new URL("../src/main.js", import.meta.url));
+    const r = spawnSync(process.execPath, [mainPath, "key", "generate", "-h", "--out", join(dir, "key"), "--public-out", join(dir, "pub")], {
+      encoding: "utf8", env: { ...process.env, SUNLIGHT_KEY_PASSPHRASE_FD: "invalid" },
+    });
+    assert.equal(r.status, 0);
+    assert.equal(r.stderr, "");
+    assert.match(r.stdout, /Usage: sunlight key generate/);
+    assert.deepEqual(readdirSync(dir), []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });
